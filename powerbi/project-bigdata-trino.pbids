@@ -1,0 +1,14 @@
+{
+  "connections": [
+    {
+      "mode": "Import",
+      "details": {
+        "protocol": "odbc",
+        "address": {
+          "dsn": "TrinoBigData"
+        }
+      },
+      "options": {}
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+order_id,order_date,region,product_category,product_name,customer_name,quantity,unit_price
+1001,2026-01-03,Phnom Penh,Electronics,Laptop A,Customer A,2,850
+1002,2026-01-04,Siem Reap,Accessories,Mouse X,Customer B,5,15
+1003,2026-01-04,Battambang,Electronics,Monitor Z,Customer C,3,220
+1004,2026-01-05,Phnom Penh,Accessories,Keyboard K,Customer D,4,35
+1005,2026-01-06,Kampot,Electronics,Printer P,Customer E,1,180
