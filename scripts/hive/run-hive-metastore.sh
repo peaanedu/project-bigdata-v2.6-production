@@ -1,20 +1,17 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
+set -e
 
-export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/hadoop/etc/hadoop}
-export HIVE_CONF_DIR=${HIVE_CONF_DIR:-/opt/hive/conf}
+echo "Starting Hive Metastore..."
+export HIVE_AUX_JARS_PATH=/opt/hive/lib/postgresql.jar
 
-for i in {1..60}; do
-  pg_isready -h postgres -p 5432 -U "${POSTGRES_USER:-hive}" -d "${POSTGRES_DB:-metastore}" >/dev/null 2>&1 && break
-  echo "Waiting for PostgreSQL... ($i/60)"
-  sleep 2
+until nc -z postgres 5432; do
+  echo "Waiting for PostgreSQL..."
+  sleep 5
 done
 
-if schematool -dbType postgres -info >/tmp/hive_schema_info.log 2>&1; then
-  echo "Hive metastore schema already present."
-else
+if ! schematool -dbType postgres -info >/dev/null 2>&1; then
   echo "Initializing Hive metastore schema..."
-  schematool -dbType postgres -initSchema --verbose || schematool -dbType postgres -upgradeSchema --verbose
+  schematool -dbType postgres -initSchema
 fi
 
-exec /entrypoint.sh
+exec /opt/hive/bin/hive --service metastore

@@ -1,13 +1,12 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
+set -e
 
-export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/hadoop/etc/hadoop}
-export HIVE_CONF_DIR=${HIVE_CONF_DIR:-/opt/hive/conf}
+echo "Starting HiveServer2..."
+export HIVE_AUX_JARS_PATH=/opt/hive/lib/postgresql.jar
 
-for i in {1..60}; do
-  bash -lc 'exec 3<>/dev/tcp/hive-metastore/9083' >/dev/null 2>&1 && break
-  echo "Waiting for Hive metastore... ($i/60)"
-  sleep 3
+until nc -z hive-metastore 9083; do
+  echo "Waiting for Hive Metastore..."
+  sleep 5
 done
 
-exec /entrypoint.sh
+exec /opt/hive/bin/hive --service hiveserver2

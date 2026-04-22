@@ -68,7 +68,12 @@ services:
     environment:
       TZ: ${TZ}
       HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
-    command: ["bash", "-lc", "mkdir -p /opt/hadoop/logs && chown -R hadoop:hadoop /opt/hadoop/logs /tmp || true && exec su -s /bin/bash hadoop -c 'yarn resourcemanager'"]
+    command:
+      [
+        "bash",
+        "-lc",
+        "mkdir -p /opt/hadoop/logs && chown -R hadoop:hadoop /opt/hadoop/logs /tmp || true && exec su -s /bin/bash hadoop -c 'yarn resourcemanager'"
+      ]
     ports:
       - "8088:8088"
     volumes:
@@ -85,7 +90,12 @@ services:
     environment:
       TZ: ${TZ}
       HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
-    command: ["bash", "-lc", "mkdir -p /opt/hadoop/logs && chown -R hadoop:hadoop /opt/hadoop/logs /tmp || true && exec su -s /bin/bash hadoop -c 'yarn nodemanager'"]
+    command:
+      [
+        "bash",
+        "-lc",
+        "mkdir -p /opt/hadoop/logs && chown -R hadoop:hadoop /opt/hadoop/logs /tmp || true && exec su -s /bin/bash hadoop -c 'yarn nodemanager'"
+      ]
     volumes:
       - ./hadoop/conf:/opt/hadoop/etc/hadoop
     depends_on:
@@ -93,7 +103,9 @@ services:
         condition: service_started
 
   hive-metastore:
-    image: apache/hive:4.1.0
+    build:
+      context: ./hive
+      dockerfile: Dockerfile
     container_name: hive-metastore
     hostname: hive-metastore
     environment:
@@ -127,7 +139,9 @@ services:
       retries: 20
 
   hive-server:
-    image: apache/hive:4.1.0
+    build:
+      context: ./hive
+      dockerfile: Dockerfile
     container_name: hive-server
     hostname: hive-server
     environment:
@@ -186,7 +200,8 @@ services:
     image: apache/spark:3.5.1-python3
     container_name: spark-master
     hostname: spark-master
-    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master", "--host", "spark-master", "--port", "7077", "--webui-port", "8080"]
+    command:
+      ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master", "--host", "spark-master", "--port", "7077", "--webui-port", "8080"]
     ports:
       - "7077:7077"
       - "8080:8080"
@@ -195,7 +210,8 @@ services:
     image: apache/spark:3.5.1-python3
     container_name: spark-worker-1
     hostname: spark-worker-1
-    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
+    command:
+      ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
     depends_on:
       - spark-master
 
@@ -203,7 +219,8 @@ services:
     image: apache/spark:3.5.1-python3
     container_name: spark-worker-2
     hostname: spark-worker-2
-    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
+    command:
+      ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
     depends_on:
       - spark-master
 
